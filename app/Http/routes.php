@@ -11,7 +11,6 @@
 |
 */
 
-Route::get('/{any?}', 'MainController@index')->where('any', '(.*)');;
+Route::get('/{any?}', 'MainController@index')->where('any', '(.*)');
 
 Route::post('/publish', 'MainController@publish');
-
