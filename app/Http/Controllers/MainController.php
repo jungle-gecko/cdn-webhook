@@ -96,9 +96,7 @@ class MainController extends Controller
                 $tag = substr($tag, 1);
             }
 
-            $folder = $payload->repository->name.'/'.$tag;
-
-            $process = new Process('cd '.$path.' && composer create-project '.$repository.'='.$tag.' '.$folder);
+            $process = new Process('cd '.$path.' && composer create-project '.$repository.'='.$tag.' '.$repository);
             $process->run();
             if ($process->isSuccessful()) {
                 $result = true;
@@ -106,7 +104,7 @@ class MainController extends Controller
         }
 
         // We send a notification by mail
-        Mail::send('emails.notification', compact('result', 'repository', 'tag', 'folder'), function ($message) use ($result) {
+        Mail::send('emails.notification', compact('result', 'repository', 'tag'), function ($message) use ($result) {
             $message
                 ->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))
                 ->to(env('MAIL_TO'))

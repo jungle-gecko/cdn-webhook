@@ -2,4 +2,4 @@
 <hr/>
 <div>Repository: <strong>{{ $repository }}</strong></div>
 <div>Release: <strong>{{ $tag }}</strong></div>
-<div>URL: <strong>{{ url($folder) }}</strong></div>
+<div>URL: <strong>{{ url($repository) }}</strong></div>
