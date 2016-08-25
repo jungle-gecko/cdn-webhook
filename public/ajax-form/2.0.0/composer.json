@@ -1,7 +1,0 @@
-{
-    "name": "jungle-gecko/ajax-form",
-    "type": "library",
-    "description": "Transformation of a static form into an ajax form made easy.",
-    "keywords": ["form", "ajax", "js", "javascript"],
-    "license": "MIT"
-}
