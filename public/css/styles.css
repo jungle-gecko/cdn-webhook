@@ -1,0 +1,80 @@
+@font-face {
+    font-family: 'itsadzokes01regular';
+    src: url('./fonts/itsadzokes01/itsadzokes01-046-webfont.eot');
+    src: url('./fonts/itsadzokes01/itsadzokes01-046-webfont.eot?#iefix') format('embedded-opentype'),
+         url('./fonts/itsadzokes01/itsadzokes01-046-webfont.woff2') format('woff2'),
+         url('./fonts/itsadzokes01/itsadzokes01-046-webfont.woff') format('woff'),
+         url('./fonts/itsadzokes01/itsadzokes01-046-webfont.ttf') format('truetype'),
+         url('./fonts/itsadzokes01/itsadzokes01-046-webfont.svg#itsadzokes01regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'exo2';
+    src: url('./fonts/exo2/Exo2.0-Regular-webfont.eot');
+    src: url('./fonts/exo2/Exo2.0-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('./fonts/exo2/Exo2.0-Regular-webfont.woff') format('woff'),
+         url('./fonts/exo2/Exo2.0-Regular-webfont.ttf') format('truetype'),
+         url('./fonts/exo2/Exo2.0-Regular-webfont.svg#exo2') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: exo2, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.navbar-brand {
+	font-family: itsadzokes01regular, exo2, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 3em; 
+}
+
+a .glyphicon {
+	padding-right: 5px;
+}
+
+.icon {
+	height: 32px;
+}
+
+td {
+	vertical-align: middle !important;
+}
+
+.row {
+	margin-bottom: 15px;
+}
+
+.navbar .navbar-header {
+    display: inline-block;
+    float: none;
+}
+
+.navbar .navbar-collapse {
+    text-align: center;
+}
+
+.navbar-default {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.navbar-default .navbar-brand {
+	color: #337ab7;
+}
+
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus {
+	color: #23527c;
+}
+
+.breadcrumb {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+	
+}
