@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use File;
 use Illuminate\Http\Request;
 use Mail;
-use \ZipArchive;
+use ZipArchive;
 
 class MainController extends Controller
 {
@@ -83,7 +83,7 @@ class MainController extends Controller
 
         $json = $request->input('payload');
         $payload = json_decode($json, false);
-        
+
         // We ensure the Secret hash is valid
         list($algo, $github_hash) = explode('=', $request->header('X-Hub-Signature'), 2);
         $payload_hash = hash_hmac($algo, $request->getContent(), env('SECRET'));
@@ -94,40 +94,40 @@ class MainController extends Controller
         $authorized_repositories = explode(',', env('AUTHORIZED_REPOSITORIES', ''));
 
         // We ensure the Repository is authorized
-		if (!in_array($payload->repository->owner->login, $authorized_repositories)) {
+        if (!in_array($payload->repository->owner->login, $authorized_repositories)) {
             abort(401);
         }
 
         $result = false;
-        
+
         $repository = $payload->repository->full_name;
-        if (! is_dir($repository)) {
+        if (!is_dir($repository)) {
             mkdir($repository, 0777, true);
         }
-        
+
         $tag = $payload->release->tag_name;
         if (starts_with($tag, 'v') or starts_with($tag, 'V')) {
             $tag = substr($tag, 1);
         }
-        if (is_dir($repository . '/' . $tag)) {
-            File::deleteDirectory($repository . '/' . $tag);
+        if (is_dir($repository.'/'.$tag)) {
+            File::deleteDirectory($repository.'/'.$tag);
         }
-        
+
         $path = env('PUBLISH_PATH', public_path($repository));
-        
+
         $client = new \GuzzleHttp\Client([
             'verify' => app_path('cacert.pem'),
         ]);
-        $client->get($payload->release->zipball_url, ['save_to' => $path . '/' . $tag . '.zip']);
-        
+        $client->get($payload->release->zipball_url, ['save_to' => $path.'/'.$tag.'.zip']);
+
         $zip = new ZipArchive();
-        $zip->open($path . '/' . $tag . '.zip');
+        $zip->open($path.'/'.$tag.'.zip');
         $zip_folder = $zip->getNameIndex(0);
         $result = $zip->extractTo($path);
         $zip->close();
-        
+
         if ($result) {
-            $result = rename($path . '/' .$zip_folder, $path . '/' . $tag);
+            $result = rename($path.'/'.$zip_folder, $path.'/'.$tag);
         }
 
         // We send a notification by mail
