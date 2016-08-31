@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use File;
 use Illuminate\Http\Request;
 use Mail;
-use Symfony\Component\Process\Process;
+use \ZipArchive;
 
 class MainController extends Controller
 {
@@ -76,31 +77,57 @@ class MainController extends Controller
         }
 
         // Else, we ensure this is a Release event
-        elseif (!$request->header('X-GitHub-Event') == 'release') {
+        if ($request->header('X-GitHub-Event') != 'release') {
             abort(500);
         }
 
-        $result = false;
-
-        $payload = json_decode($request->getContent());
+        $json = $request->input('payload');
+        $payload = json_decode($json, false);
+        
+        // We ensure the Secret hash is valid
+        list($algo, $github_hash) = explode('=', $request->header('X-Hub-Signature'), 2);
+        $payload_hash = hash_hmac($algo, $request->getContent(), env('SECRET'));
+        if (!hash_equals($github_hash, $payload_hash)) {
+            abort(401);
+        }
 
         $authorized_repositories = explode(',', env('AUTHORIZED_REPOSITORIES', ''));
 
-        if ($payload->action == 'published' && $repository = in_array($payload->repository->owner->login, $authorized_repositories)) {
-            $path = env('PUBLISH_PATH', public_path());
+        // We ensure the Repository is authorized
+		if (!in_array($payload->repository->owner->login, $authorized_repositories)) {
+            abort(401);
+        }
 
-            $repository = $payload->repository->full_name;
-
-            $tag = $payload->release->tag_name;
-            if (starts_with($tag, 'v') or starts_with($tag, 'V')) {
-                $tag = substr($tag, 1);
-            }
-
-            $process = new Process('cd '.$path.' && composer create-project '.$repository.'='.$tag.' '.$repository);
-            $process->run();
-            if ($process->isSuccessful()) {
-                $result = true;
-            }
+        $result = false;
+        
+        $repository = $payload->repository->full_name;
+        if (! is_dir($repository)) {
+            mkdir($repository, 0777, true);
+        }
+        
+        $tag = $payload->release->tag_name;
+        if (starts_with($tag, 'v') or starts_with($tag, 'V')) {
+            $tag = substr($tag, 1);
+        }
+        if (is_dir($repository . '/' . $tag)) {
+            File::deleteDirectory($repository . '/' . $tag);
+        }
+        
+        $path = env('PUBLISH_PATH', public_path($repository));
+        
+        $client = new \GuzzleHttp\Client([
+            'verify' => app_path('cacert.pem'),
+        ]);
+        $client->get($payload->release->zipball_url, ['save_to' => $path . '/' . $tag . '.zip']);
+        
+        $zip = new ZipArchive();
+        $zip->open($path . '/' . $tag . '.zip');
+        $zip_folder = $zip->getNameIndex(0);
+        $result = $zip->extractTo($path);
+        $zip->close();
+        
+        if ($result) {
+            $result = rename($path . '/' .$zip_folder, $path . '/' . $tag);
         }
 
         // We send a notification by mail

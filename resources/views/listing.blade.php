@@ -59,7 +59,11 @@
         							</tr>
         						@endforeach
     						@empty
-    							No resource available.
+    							<tr>
+    								<td>
+    									No resource available.
+    								</td>
+    							</tr>
     						@endforelse 
 						</tbody>
 					</table>
